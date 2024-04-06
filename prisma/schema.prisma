@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ClassType{
+  regular
+  honor
+  ap
+  dualEnrollment
+  ib
+}
+
+enum ClassCategory{
+  A //HIstory
+  B //English
+  C //Math
+  D //Lab Science
+  E // Foreign Language
+  F // Visual and Performing Arts
+  G // College Prep Elective
+}
+
+enum DesiredDifficulty{
+  A //0 - 10
+  B //10 - 20
+  C //20 - 30
+  D //30 - 40
+  E //40 - 50
+}
+
+enum GradeOffered{
+  A //9th
+  B //10th
+  C //11th
+  D //12th
+}
+
+model Class {
+  id              Int    @id @default(autoincrement())
+  className       String @unique
+  offered         Boolean
+  taken           Boolean
+  gradeOffered    GradeOffered 
+  classType       ClassType
+  classCategory   ClassCategory
+  classDifficulty Int
+  students Student[]
+  // Relations to Student are defined below in the Student model.
+}
+
+model Student {
+  id                Int      @id @default(autoincrement())
+  name              String
+  careerDecide      Boolean
+  careerPlan        String
+  careerGoals       String[]
+  classes    Class[]    
+  advancedClassCap  Int
+  totalClassCap     Int
+  desiredDifficulty DesiredDifficulty
+}
+
