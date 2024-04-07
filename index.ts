@@ -3,6 +3,7 @@ import { Pool } from "pg";
 import { Database } from "./api/database";
 import dotenv from 'dotenv';
 import { DesiredDifficulty } from '@prisma/client';
+import { error } from 'console';
 
 dotenv.config();
 const app = express()
@@ -10,6 +11,7 @@ const userDb = new Database()
 
 enum ClassType{
   regular,
+
   honor,
   ap,
   dualEnrollment,
@@ -30,8 +32,8 @@ interface ClassInfo {
   offered: boolean,
   taken: boolean,
   gradeOffered: number,
-  classType: ClassType
-  classCategory: ClassCategory
+  classType: string
+  classCategory: string
   classDifficulty: number,
   students: StudentInfo[]
 }
@@ -58,6 +60,17 @@ const student:StudentInfo = {
   totalClassCap: 6,
   desiredDifficulty: "B" 
 }
+
+const exampleClassData: ClassInfo = {
+  className: "AP Calculus AB",
+  offered: true,
+  taken: false, // since this is fake data, we can assume this class hasn't been taken yet
+  gradeOffered: 11, // corresponds to the 11th grade
+  classType: "ap", // using the lowercase string representation of the ClassType enum
+  classCategory: "C", // assuming 'C' corresponds to Math in ClassCategory
+  classDifficulty: 8, // an arbitrary difficulty rating
+  students: [] // starting with an empty array of students
+};
 
 app.use(express.json())
 
@@ -101,6 +114,17 @@ app.post("/api/createStudent", (req, res) => {
       console.error(error); // Log the error for debugging
       res.status(500).send("Error creating user: " + error.message);
     });
+});
+
+
+app.post("/api/createClass", async (req, res) => {
+  try {
+    const classData = req.body; // This is the fake data you receive from the API call
+    const newClass = await userDb.createClass(classData);
+    res.status(201).json(newClass);
+  } catch (error:any) {
+    res.status(500).send("Error creating class: " + error.message);
+  }
 });
 
 

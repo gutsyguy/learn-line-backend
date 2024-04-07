@@ -1,4 +1,5 @@
-import { DesiredDifficulty, Student } from "@prisma/client";
+import { ClassCategory, ClassType, DesiredDifficulty, GradeOffered, Student } from "@prisma/client";
+import { ClassInfo, StudentInfo } from "../lib/Interfaces";
 
 const {PrismaClient} = require("@prisma/client")
 
@@ -6,45 +7,29 @@ require("dotenv").config()
 
 const prisma = new PrismaClient();
 
-enum ClassType{
-  regular,
-  honor,
-  ap,
-  dualEnrollment,
-  ib,
-}
-
-enum ClassCategory{
-  A,
-  B,
-  C,
-  D,
-  E,
-  F,
-  G
-}
-
-enum GradeOffered{
-  A = 9,
-  B = 10,
-  C = 11,
-  D = 12
-}
-
-enum IntendedDifficulty{
-  A,
-  B,
-  C,
-  D, 
+const letterToGrade = (letter:String) =>{
+  switch (letter){
+    case "A": 
+      return 9
+      break;
+    case "B":
+      return 10
+    case "C":
+      return 11
+    case "D":
+      return 12
+    default:
+      return 9
+  }
 }
 
 const fillerClasses:ClassInfo[] = [{
   className: "AP Physics C:Mechanics",
   offered: true,
   taken: true,
-  gradeOffered: GradeOffered.C,
+  gradeOffered: letterToGrade(GradeOffered.C),
   classType: ClassType.ap,
-  classCategory: ClassCategory.D,
+  classCategory: ClassCategory.C,
   classDifficulty: 10,  
   students: [] 
 },
@@ -52,84 +37,79 @@ const fillerClasses:ClassInfo[] = [{
   className: "AP Chemistry",
   offered: true,
   taken: true,
-  gradeOffered: GradeOffered.C,
+  gradeOffered: letterToGrade(GradeOffered.C),
   classType: ClassType.ap,
   classCategory: ClassCategory.D,
   classDifficulty: 10,  
   students: [] 
 }]
 
-
-interface ClassInfo {
-  className: string,
-  offered: boolean,
-  taken: boolean,
-  gradeOffered: number,
-  classType: ClassType
-  classCategory: ClassCategory
-  classDifficulty: number,
-  students: StudentInfo[]
-}
-
-export interface StudentInfo{
-  id:number,
-  name:string,
-  careerDecided: boolean,
-  careerPlan: string,
-  careerGoals: string[],
-  classes: ClassInfo[],
-  advancedClassCap: number,
-  totalClassCap: number,
-  desiredDifficulty: DesiredDifficulty
-}
-
-
-
-// export class Database {
-//   async createStudent(
-//     /* name:string,
-//     careerDecided: boolean,
-//     careerPlan: string | null,
-//     careerGoals: string[] | null,
-//     classes: ClassInfo[],
-//     advancedClassCap: number,
-//     totalClassCap: number,
-//     desiredDifficulty: number
-//     */
-//     student:StudentInfo
-//   ){
-//     await prisma.student.create({
-//       id: 1, //@todo make this a unique value
-//       name: student.name,
-//       careeerDecided: student.careerDecided,
-//       careerPlan: student.careerPlan, 
-//       careerGoals: student.careerGoals,
-//       classes: fillerClasses,
-//       advancedClassCap: student.advancedClassCap,
-//       totalClassCap: student.totalClassCap,
-//       desiredDifficulty: student.desiredDifficulty 
-//     })
-//   }
-// }
-
 export class Database {
 
-
-  async createStudent(student:StudentInfo) {
+  async createStudent(student: StudentInfo) {
     const createdStudent = await prisma.student.create({
       data: {
         name: student.name,
         careerDecided: student.careerDecided,
         careerPlan: student.careerPlan,
-        careerGoals:  student.careerGoals , // Assuming careerGoals is an array
+        careerGoals: student.careerGoals, // Assuming careerGoals is an array of strings
+        classes: fillerClasses, // Assuming that classes is a relation and you have set up the Prisma schema to handle nested writes
         advancedClassCap: student.advancedClassCap,
         totalClassCap: student.totalClassCap,
-        desiredDifficulty: "B",
-        // Add other fields as necessary according to your Prisma schema
+        desiredDifficulty: student.desiredDifficulty,
       },
     });
     return createdStudent;
   }
+
+  async createClass(classInfo: ClassInfo) {
+    // You need to make sure that the classType and classCategory 
+    // match the enum values from your Prisma schema
+    const createdClass = await prisma.class.create({
+      data: {
+        className: classInfo.className,
+        offered: classInfo.offered,
+        taken: classInfo.taken,
+        gradeOffered: classInfo.gradeOffered,
+        classType: ClassType[classInfo.classType as keyof typeof ClassType], 
+        classCategory: ClassCategory[classInfo.classCategory as keyof typeof ClassCategory],
+        classDifficulty: classInfo.classDifficulty,
+        // Omit the students field if you are not connecting students at creation time
+      },
+    });
+    return createdClass;
+  }
+  
+
+  // async createClass(classInfo: ClassInfo) {
+  //   // Ensure `classInfo.classType` and `classInfo.classCategory` are of type `string`
+  //   // and that they match the actual values expected by the schema.
+  //   const createdClass = await prisma.class.create({
+  //     // data: {
+  //     //   className: classInfo.className,
+  //     //   offered: classInfo.offered,
+  //     //   taken: classInfo.taken,
+  //     //   gradeOffered: classInfo.gradeOffered,
+  //     //   classType: classInfo.classType, // Convert the enum to its string representation
+  //     //   classCategory: classInfo.classCategory, // Same as above for `class
+  //     //   classDifficulty: classInfo.classDifficulty,
+  //     //   // Assuming that students is a relational field, handle according to Prisma's documentation.
+  //     // },
+  //     data: {
+  //       className: fillerClasses[0].className,
+  //       offered: fillerClasses[0].offered,
+  //       taken: fillerClasses[0].taken,
+  //       gradeOffered: fillerClasses[0].gradeOffered,
+  //       classType: fillerClasses[0].classType, // Convert the enum to its string representation
+  //       classCategory: fillerClasses[0].classCategory, // Same as above for `class
+  //       classDifficulty: fillerClasses[0].classDifficulty,
+  //       // Assuming that students is a relational field, handle according to Prisma's documentation.
+  //     },
+  //   });
+
+  //   return createdClass;
+  // }
+  
 
   async getAllStudents(){
     const students = await prisma.student.findMany()
