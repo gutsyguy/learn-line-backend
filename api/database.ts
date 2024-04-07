@@ -1,4 +1,4 @@
-import { DesiredDifficulty } from "@prisma/client";
+import { DesiredDifficulty, Student } from "@prisma/client";
 
 const {PrismaClient} = require("@prisma/client")
 
@@ -130,6 +130,23 @@ export class Database {
     });
     return createdStudent;
   }
+
+  async getAllStudents(){
+    const students = await prisma.student.findMany()
+    return students
+  }
+
+  async updateClass(name:string, classes:ClassInfo[]){
+    await prisma.student.update({
+      where:{
+        name: name
+      },
+      data: {
+        classes: classes
+      }
+    })
+  } 
+
 }
 async function ReadUsers(){
   const allUsers = await prisma.student.findMany()

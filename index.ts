@@ -96,7 +96,14 @@ app.get("/", (req: Request, res: any) => {
 //     });
 // });
 
-app.post("/api/signup", (req, res) => {
+app.get("/api/getStudent", (req, res) =>{
+  userDb.getAllStudents().then(() => {
+    res.status(201).send("e")
+  })
+
+})
+
+app.post("/api/createStudent", (req, res) => {
   const { email, name, password, vehicleType, transitCompany } = req.body;
 
   // Validate the request body here as necessary before calling createStudent
