@@ -1,0 +1,32 @@
+{
+    "id": 1,
+    "name": "Yalamber",
+    "careerDecided": true,
+    "careerPlan": "Software Engineer",
+    "careerGoals": [""],
+    "classes": [
+        {
+            "className": "AP Physics C:Mechanics",
+            "offered": true,
+            "taken": true,
+            "gradeOffered": 11,
+            "classType": "AP",
+            "classCategory": "D",
+            "classDifficulty": 10,  
+            "students": [] 
+          },
+          {
+            "className": "AP Chemistry",
+            "offered": true,
+            "taken": true,
+            "gradeOffered": 11,
+            "classType": "AP",
+            "classCategory": "D",
+            "classDifficulty": 10,  
+            "students": [] 
+          }
+    ],
+    "advancedClassCap": 6,
+    "totalClassCap": 6,
+    "desiredDifficulty": 10
+  }

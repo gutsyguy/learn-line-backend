@@ -1,3 +1,5 @@
+import { DesiredDifficulty } from "@prisma/client";
+
 const {PrismaClient} = require("@prisma/client")
 
 require("dotenv").config()
@@ -78,7 +80,7 @@ export interface StudentInfo{
   classes: ClassInfo[],
   advancedClassCap: number,
   totalClassCap: number,
-  desiredDifficulty: number
+  desiredDifficulty: DesiredDifficulty
 }
 
 
@@ -119,10 +121,10 @@ export class Database {
         name: student.name,
         careerDecided: student.careerDecided,
         careerPlan: student.careerPlan,
-        careerGoals: { set: student.careerGoals }, // Assuming careerGoals is an array
+        careerGoals:  student.careerGoals , // Assuming careerGoals is an array
         advancedClassCap: student.advancedClassCap,
         totalClassCap: student.totalClassCap,
-        desiredDifficulty: student.desiredDifficulty,
+        desiredDifficulty: "B",
         // Add other fields as necessary according to your Prisma schema
       },
     });

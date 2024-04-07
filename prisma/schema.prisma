@@ -26,10 +26,12 @@ enum ClassCategory{
   B //English
   C //Math
   D //Lab Science
-  E // Foreign Language
-  F // Visual and Performing Arts
-  G // College Prep Elective
+  E //Foreign Language
+  F //Visual and Performing Arts
+  G  //College Prep Elective
 }
+
+
 
 enum DesiredDifficulty{
   A //0 - 10
@@ -62,7 +64,7 @@ model Class {
 model Student {
   id                Int      @id @default(autoincrement())
   name              String
-  careerDecide      Boolean
+  careerDecided      Boolean
   careerPlan        String
   careerGoals       String[]
   classes    Class[]    

@@ -1,8 +1,10 @@
-
-const express = require('express');
+import express from 'express';
 import { Pool } from "pg";
 import { Database } from "./api/database";
+import dotenv from 'dotenv';
+import { DesiredDifficulty } from '@prisma/client';
 
+dotenv.config();
 const app = express()
 const userDb = new Database()
 
@@ -42,7 +44,7 @@ export interface StudentInfo{
   classes: ClassInfo[],
   advancedClassCap: number,
   totalClassCap: number,
-  desiredDifficulty: number
+  desiredDifficulty: DesiredDifficulty
 }
 
 const student:StudentInfo = {
@@ -54,7 +56,7 @@ const student:StudentInfo = {
   classes: [],
   advancedClassCap: 6,
   totalClassCap: 6,
-  desiredDifficulty: 10
+  desiredDifficulty: "B" 
 }
 
 app.use(express.json())
@@ -78,18 +80,39 @@ const port = process.env.PORT || 8080;
 
 app.get("/", (req: Request, res: any) => {
   getPostgresVersion();
-  res.send("Hello World");
+  res.send("Hello Bird");
 });
 
-app.post("/api/signup", (req: any, res: any) => {
+// app.post("/api/signup", (req: any, res: any) => {
+//   const { email, name, password, vehicleType, transitCompany } = req.body;
+//   // Make sure to handle the async operation properly
+//   userDb
+//     .createStudent(student)
+//     .then(() => {
+//       res.status(201).send("User created");
+//     })
+//     .catch((error: any) => {
+//       res.status(500).send("Error creating bird");
+//     });
+// });
+
+app.post("/api/signup", (req, res) => {
   const { email, name, password, vehicleType, transitCompany } = req.body;
-  // Make sure to handle the async operation properly
+
+  // Validate the request body here as necessary before calling createStudent
+
   userDb
     .createStudent(student)
     .then(() => {
       res.status(201).send("User created");
     })
-    .catch((error: any) => {
-      res.status(500).send("Error creating user");
+    .catch((error) => {
+      console.error(error); // Log the error for debugging
+      res.status(500).send("Error creating user: " + error.message);
     });
+});
+
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
 });
