@@ -133,7 +133,16 @@ export class Database {
 
   async getAllStudents(){
     const students = await prisma.student.findMany()
-    return students
+    console.log(students)
+  }
+
+  async checkStudent(name: string){
+    const user = await prisma.student.findFirst({
+      where:{
+        name: name
+      }
+    })
+    return user
   }
 
   async updateClass(name:string, classes:ClassInfo[]){
@@ -148,6 +157,7 @@ export class Database {
   } 
 
 }
+
 async function ReadUsers(){
   const allUsers = await prisma.student.findMany()
   console.log(allUsers)

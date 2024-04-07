@@ -83,33 +83,17 @@ app.get("/", (req: Request, res: any) => {
   res.send("Hello Bird");
 });
 
-// app.post("/api/signup", (req: any, res: any) => {
-//   const { email, name, password, vehicleType, transitCompany } = req.body;
-//   // Make sure to handle the async operation properly
-//   userDb
-//     .createStudent(student)
-//     .then(() => {
-//       res.status(201).send("User created");
-//     })
-//     .catch((error: any) => {
-//       res.status(500).send("Error creating bird");
-//     });
-// });
 
 app.get("/api/getStudent", (req, res) =>{
-  userDb.getAllStudents().then(() => {
-    res.status(201).send("e")
-  })
-
+  userDb.getAllStudents()
 })
 
 app.post("/api/createStudent", (req, res) => {
-  const { email, name, password, vehicleType, transitCompany } = req.body;
-
-  // Validate the request body here as necessary before calling createStudent
+  // {name, careerDecided, careerPlan, careerGoals, classes, advancedClassCap, totalClassCap, desiredDifficulty} = req.body
+  const studente = req.body
 
   userDb
-    .createStudent(student)
+    .createStudent(studente)
     .then(() => {
       res.status(201).send("User created");
     })
