@@ -21,6 +21,7 @@ const letterToGrade = (letter) => {
     }
 };
 const fillerClasses = [{
+        id: 1,
         className: "AP Physics C:Mechanics",
         offered: true,
         taken: true,
@@ -31,6 +32,7 @@ const fillerClasses = [{
         students: []
     },
     {
+        id: 2,
         className: "AP Chemistry",
         offered: true,
         taken: true,
@@ -48,8 +50,7 @@ class Database {
                 careerDecided: student.careerDecided,
                 careerPlan: student.careerPlan,
                 careerGoals: student.careerGoals, // Assuming careerGoals is an array of strings
-                classes: fillerClasses, // Assuming that classes is a relation and you have set up the Prisma schema to handle nested writes
-                advancedClassCap: student.advancedClassCap,
+                advancedClassCap: 4,
                 totalClassCap: student.totalClassCap,
                 desiredDifficulty: student.desiredDifficulty,
             },
@@ -72,6 +73,16 @@ class Database {
             },
         });
         return createdClass;
+    }
+    async updateStudent(name, classes) {
+        await prisma.student.update({
+            where: {
+                name: name
+            },
+            data: {
+                classes: classes
+            }
+        });
     }
     // async createClass(classInfo: ClassInfo) {
     //   // Ensure `classInfo.classType` and `classInfo.classCategory` are of type `string`
@@ -112,13 +123,29 @@ class Database {
         });
         return user;
     }
+    async addClass(studentId, classIds) {
+        await prisma.student.update({
+            where: {
+                id: studentId, // Identify the student by their ID
+            },
+            data: {
+                classes: {
+                    connect: classIds.map(id => ({ id })) // Connect classes by their IDs
+                }
+            }
+        });
+    }
     async updateClass(name, classes) {
         await prisma.student.update({
             where: {
                 name: name
             },
             data: {
-                classes: classes
+                classes: {
+                    updateMany: {
+                        data: classes,
+                    }
+                }
             }
         });
     }

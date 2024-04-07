@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors'
 import { Pool } from "pg";
 import { Database } from "./api/database";
 import dotenv from 'dotenv';
@@ -6,6 +7,7 @@ import { DesiredDifficulty } from '@prisma/client';
 import { error } from 'console';
 
 dotenv.config();
+
 const app = express()
 const userDb = new Database()
 
@@ -27,6 +29,12 @@ enum ClassCategory{
   F,
   G
 }
+
+interface UpdateStudent{
+  name: string,
+  classes: ClassInfo[]
+}
+
 interface ClassInfo {
   className: string,
   offered: boolean,
@@ -72,6 +80,11 @@ const exampleClassData: ClassInfo = {
   students: [] // starting with an empty array of students
 };
 
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}))
 app.use(express.json())
 
 const pool = new Pool({
@@ -115,6 +128,20 @@ app.post("/api/createStudent", (req, res) => {
       res.status(500).send("Error creating user: " + error.message);
     });
 });
+
+app.patch("/api/updateStudent", (req, res) =>{
+  const { name, classes } = req.body;
+
+  userDb
+    .updateStudent(name, classes)
+    .then(() => {
+      res.status(201).send("User updated");
+    })
+    .catch((error) => {
+      console.error(error); // Log the error for debugging
+      res.status(500).send("Error updating user: " + error.message);
+    });
+})
 
 
 app.post("/api/createClass", async (req, res) => {

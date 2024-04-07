@@ -32,6 +32,7 @@ export enum GradeOffered{
   }
 
 export interface ClassInfo {
+    id: number,
     className: string,
     offered: boolean,
     taken: boolean,

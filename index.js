@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
 const pg_1 = require("pg");
 const database_1 = require("./api/database");
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -49,6 +50,11 @@ const exampleClassData = {
     classDifficulty: 8, // an arbitrary difficulty rating
     students: [] // starting with an empty array of students
 };
+app.use((0, cors_1.default)({
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use(express_1.default.json());
 const pool = new pg_1.Pool({
     connectionString: process.env.DATABASE_URL,
@@ -83,6 +89,18 @@ app.post("/api/createStudent", (req, res) => {
         .catch((error) => {
         console.error(error); // Log the error for debugging
         res.status(500).send("Error creating user: " + error.message);
+    });
+});
+app.patch("/api/updateStudent", (req, res) => {
+    const { name, classes } = req.body;
+    userDb
+        .updateStudent(name, classes)
+        .then(() => {
+        res.status(201).send("User updated");
+    })
+        .catch((error) => {
+        console.error(error); // Log the error for debugging
+        res.status(500).send("Error updating user: " + error.message);
     });
 });
 app.post("/api/createClass", async (req, res) => {
